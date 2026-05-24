@@ -25,7 +25,7 @@ function ImageSlider({ images, title }: { images: string[], title: string }) {
           src={`${import.meta.env.VITE_IMAGE_BASE_URL}${images[active]}`}
           alt={`${title} - photo ${active + 1}`}
           className="w-full h-full object-cover transition-all duration-300"
-          onError={(e) => { (e.target as HTMLImageElement).src = "https://via.placeholder.com/800x400?text=No+Image+Available"; }}
+          onError={(e) => { (e.target as HTMLImageElement).src = "https://placeholder.com/800x400?text=No+Image+Available"; }}
         />
         {images.length > 1 && (
           <>

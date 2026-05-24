@@ -166,7 +166,7 @@ const ActiveListings = () => {
                           alt={listing.title}
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = "https://via.placeholder.com/150?text=House";
+                            (e.target as HTMLImageElement).src = "https://placeholder.com/150?text=House";
                           }}
                         />
                       ) : (
