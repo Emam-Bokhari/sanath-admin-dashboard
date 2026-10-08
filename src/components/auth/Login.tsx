@@ -48,7 +48,7 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen w-screen flex items-center justify-center bg-linear-to-br from-[#f7f8fc] to-[#eef2ff] px-4">
+        <div className="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-[#f7f8fc] to-[#eef2ff] px-4">
             <Card className="w-full max-w-md rounded-2xl shadow-lg" data-aos="zoom-in">
                 <CardHeader className="text-center space-y-2">
                     <div className="flex justify-center">
@@ -87,7 +87,7 @@ export default function Login() {
                                 <button
                                     type="button"
                                     onClick={() => setViewPassword(!viewPassword)}
-                                    className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 bg-transparent!"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 bg-transparent border-none p-0 cursor-pointer flex items-center justify-center"
                                 >
                                     {viewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>

@@ -1,3 +1,29 @@
+export type BadgeCode =
+  | "SOLD_STC"
+  | "SOLD"
+  | "REDUCED_TODAY"
+  | "BACK_ON_MARKET"
+  | "RECENTLY_RELISTED"
+  | "PRICE_REDUCED"
+  | "ADDED_TODAY"
+  | "ADDED_YESTERDAY"
+  | "ADDED_LAST_7_DAYS"
+  | "NEW"
+  | "FEATURED";
+
+export interface IBadge {
+  code: BadgeCode | string;
+  label: string;
+}
+
+export interface IPriceHistory {
+  previousPrice: number;
+  newPrice: number;
+  difference?: number;
+  percentageReduced?: number;
+  changedAt: string;
+}
+
 export interface ListingDetail {
   id: number;
   featured: boolean;
@@ -31,4 +57,16 @@ export interface ListingDetail {
   status: "active" | "pending" | "sold" | "rejected";
   publishedDate: string;
   images: number; // count
+  askingPrice?: number;
+  originalPrice?: number;
+  previousPrice?: number;
+  priceHistory?: IPriceHistory[];
+  isFeatured?: boolean;
+  marketStatus?: string;
+  badges?: IBadge[];
+  primaryBadge?: IBadge;
+  firstPublishedAt?: string;
+  lastPriceReducedAt?: string;
+  relistedAt?: string;
+  backOnMarketAt?: string;
 }
