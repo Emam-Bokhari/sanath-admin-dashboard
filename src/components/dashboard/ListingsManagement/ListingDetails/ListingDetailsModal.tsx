@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogDescription } f
 import { MapPin, Eye, Home, Bath, Maximize, Tag, Calendar, User, FileText, CheckCircle2, ChevronLeft, ChevronRight, Mail, Phone } from "lucide-react";
 import ListingStatusBadge from "../ListingStatusBadge";
 import { useGetListingByIdQuery } from "../../../../redux/features/listings/listingsApi";
+import { PropertyBadgesList, MarketActivityDate, formatUKDate } from "../PropertyBadge";
 
 interface Props {
   listing: any | null;
@@ -134,13 +135,16 @@ const ListingDetailsModal: React.FC<Props> = ({ listing, isOpen, onClose }) => {
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         {/* Header */}
-        <DialogHeader className="sticky top-0 bg-white z-10 px-6 py-4 border-b border-gray-100 text-left flex flex-row items-center justify-between">
-          <div>
-            <DialogTitle className="text-lg font-bold text-gray-900 truncate">
-              {detail?.title || "Listing Details"}
-            </DialogTitle>
-            <DialogDescription className="text-xs text-gray-500 mt-0.5">
-              Review property information
+        <DialogHeader className="sticky top-0 bg-white z-10 px-6 py-4 border-b border-gray-100 text-left flex flex-row items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <DialogTitle className="text-lg font-bold text-gray-900 truncate">
+                {detail?.title || "Listing Details"}
+              </DialogTitle>
+              {detail && <PropertyBadgesList listing={detail} />}
+            </div>
+            <DialogDescription className="text-xs text-gray-500">
+              Review property information and market status
             </DialogDescription>
           </div>
           {detail && <ListingStatusBadge status={detail.status} />}
@@ -168,7 +172,15 @@ const ListingDetailsModal: React.FC<Props> = ({ listing, isOpen, onClose }) => {
               {/* Price & Basic Info */}
               <div className="flex items-start justify-between flex-wrap gap-4">
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">£{detail.askingPrice?.toLocaleString()}</p>
+                  <div className="flex items-baseline gap-2.5 flex-wrap">
+                    <p className="text-2xl font-bold text-gray-900">£{detail.askingPrice?.toLocaleString()}</p>
+                    {detail.originalPrice && detail.originalPrice > detail.askingPrice && (
+                      <span className="text-base text-gray-400 line-through font-normal">
+                        £{detail.originalPrice.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                  <MarketActivityDate listing={detail} className="text-xs text-slate-500 font-medium block mt-0.5" />
                   <p className="text-sm text-gray-500 flex items-center gap-1.5 mt-1">
                     <MapPin className="w-4 h-4 text-gray-400" />
                     {detail.location?.address || `${detail.city}, ${detail.country}`}
@@ -200,12 +212,62 @@ const ListingDetailsModal: React.FC<Props> = ({ listing, isOpen, onClose }) => {
                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Property Information</h4>
                 <div className="bg-gray-50 rounded-xl px-4 py-1 border border-gray-100">
                   <InfoRow icon={Home} label="Property Type" value={detail.propertyType} />
+                  <InfoRow icon={Tag} label="Market Status" value={detail.marketStatus || detail.primaryBadge?.label || "Available"} />
+                  {detail.originalPrice && detail.originalPrice > detail.askingPrice && (
+                    <InfoRow icon={Tag} label="Original Price" value={`£${detail.originalPrice.toLocaleString()}`} />
+                  )}
+                  {detail.lastPriceReducedAt && (
+                    <InfoRow icon={Calendar} label="Price Reduced On" value={formatUKDate(detail.lastPriceReducedAt)} />
+                  )}
+                  {detail.relistedAt && (
+                    <InfoRow icon={Calendar} label="Relisted On" value={formatUKDate(detail.relistedAt)} />
+                  )}
+                  {detail.backOnMarketAt && (
+                    <InfoRow icon={Calendar} label="Back on Market On" value={formatUKDate(detail.backOnMarketAt)} />
+                  )}
                   <InfoRow icon={Tag} label="Tenure" value={detail.tenure} />
                   <InfoRow icon={FileText} label="Council Tax Band" value={detail.councilTaxBand} />
-                  <InfoRow icon={Calendar} label="Listed Date" value={new Date(detail.createdAt).toLocaleDateString()} />
+                  <InfoRow icon={Calendar} label="Listed Date" value={formatUKDate(detail.firstPublishedAt || detail.createdAt)} />
                   <InfoRow icon={User} label="Leads Generated" value={detail.leadsCount || 0} />
                 </div>
               </div>
+
+              {/* Price Reduction History */}
+              {detail.priceHistory && detail.priceHistory.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Price Reduction History</h4>
+                  <div className="border border-gray-100 rounded-xl overflow-hidden bg-white">
+                    <table className="w-full text-xs">
+                      <thead className="bg-gray-50 border-b border-gray-100">
+                        <tr>
+                          <th className="py-2.5 px-4 text-left font-semibold text-gray-500">Date</th>
+                          <th className="py-2.5 px-4 text-right font-semibold text-gray-500">Previous Price</th>
+                          <th className="py-2.5 px-4 text-right font-semibold text-gray-500">New Price</th>
+                          <th className="py-2.5 px-4 text-right font-semibold text-gray-500">Reduction</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {detail.priceHistory.map((item: any, idx: number) => {
+                          const prev = item.previousPrice;
+                          const next = item.newPrice;
+                          const diff = item.difference ?? (prev && next ? prev - next : 0);
+                          const pct = item.percentageReduced ?? (prev && next ? Math.round(((prev - next) / prev) * 100) : 0);
+                          return (
+                            <tr key={idx} className="hover:bg-gray-50/50">
+                              <td className="py-2.5 px-4 text-gray-700 font-medium">{formatUKDate(item.changedAt)}</td>
+                              <td className="py-2.5 px-4 text-right text-gray-400 line-through">£{prev?.toLocaleString()}</td>
+                              <td className="py-2.5 px-4 text-right font-semibold text-gray-900">£{next?.toLocaleString()}</td>
+                              <td className="py-2.5 px-4 text-right font-semibold text-amber-600">
+                                -{pct}% {diff > 0 && <span className="text-[11px] font-normal text-gray-400 ml-1">(£{diff.toLocaleString()})</span>}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
 
               {/* Agent & Agency Info */}
               <div>

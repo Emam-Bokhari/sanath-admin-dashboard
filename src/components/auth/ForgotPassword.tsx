@@ -37,7 +37,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen w-screen flex items-center justify-center bg-linear-to-br from-[#f7f8fc] to-[#eef2ff] px-4">
+    <div className="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-[#f7f8fc] to-[#eef2ff] px-4">
       <Card className="w-full max-w-md rounded-2xl shadow-lg" data-aos="zoom-in">
         <form onSubmit={handleForgotPassword}>
           <CardHeader className="text-center space-y-2">

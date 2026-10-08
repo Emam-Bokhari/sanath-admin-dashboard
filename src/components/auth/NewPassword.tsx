@@ -45,7 +45,7 @@ const navigate = useNavigate();
   };
 
   return (
-    <div className="flex flex-col w-screen items-center justify-center min-h-screen bg-gray-100 p-4">
+    <div className="flex flex-col w-full items-center justify-center min-h-screen bg-gray-100 p-4">
       <Card className="w-[90%] mx-auto md:w-full max-w-xl p-0 sm:p-10" data-aos="zoom-in">
         <CardHeader className="flex flex-col items-center space-y-3">
           <img

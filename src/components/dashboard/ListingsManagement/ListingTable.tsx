@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ListingDetailsModal from "./ListingDetails/ListingDetailsModal";
 import ListingStatusBadge from "./ListingStatusBadge";
+import { PropertyBadgesList, MarketActivityDate, PriceWithReduction } from "./PropertyBadge";
 
 import { Check, Eye, Trash, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -49,8 +50,9 @@ const ListingTable: React.FC<Props> = ({ listings, isLoading }) => {
                             {listings.map(l =>
                                 <tr key={l._id} className="border-b border-gray-50 hover:bg-gray-50/60 last:border-0">
                                     <td className="w-[14.28%] py-3.5 px-4 first:pl-6 last:pr-6">
-                                        <div className="flex items-center gap-1.5 font-semibold text-[13.5px] text-gray-900 mb-1">
-                                            {l.title}
+                                        <div className="flex items-center gap-1.5 font-semibold text-[13.5px] text-gray-900 mb-1 flex-wrap">
+                                            <span>{l.title}</span>
+                                            <PropertyBadgesList listing={l} size="sm" />
                                         </div>
                                         <div className="flex items-center gap-1 text-[11.5px] text-gray-400 mb-1">
                                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -58,15 +60,20 @@ const ListingTable: React.FC<Props> = ({ listings, isLoading }) => {
                                             </svg>
                                             {l.location?.address || l.city}
                                         </div>
-
+                                        <MarketActivityDate listing={l} className="text-[11px] text-slate-500 font-medium block" />
                                     </td>
                                     <td className="w-[14.28%] py-3.5 px-4 first:pl-6 last:pr-6">
                                         <p className="text-[13px] font-medium text-gray-900">{l.agentId?.name || "Unknown"}</p>
                                         <p className="text-[11px] text-gray-400">{l.agentId?.agencyName || "N/A"}</p>
                                     </td>
                                     <td className="w-[14.28%] py-3.5 px-4 first:pl-6 last:pr-6">
-                                        <p className="text-[13.5px] font-semibold text-gray-900">£{l.askingPrice?.toLocaleString()}</p>
-                                        {l.tenure && <p className="text-[11px] text-gray-400">{l.tenure}</p>}
+                                        <PriceWithReduction
+                                            askingPrice={l.askingPrice}
+                                            originalPrice={l.originalPrice}
+                                            priceClassName="text-[13.5px] font-semibold text-gray-900"
+                                            strikeClassName="text-[11.5px] text-gray-400 line-through font-normal"
+                                        />
+                                        {l.tenure && <p className="text-[11px] text-gray-400 mt-0.5">{l.tenure}</p>}
                                     </td>
                                     <td className="w-[14.28%] py-3.5 px-4 first:pl-6 last:pr-6">
                                         <p className="text-[13px] text-gray-800">{l.listingType}</p>
